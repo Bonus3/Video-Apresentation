@@ -32,6 +32,27 @@
             });
             return this;
         },
+        getError: function () {
+            var error = {
+                code: -1,
+                string: "Error not stated"
+            };
+            if (typeof this.element.error.code !== "undefined") {
+                error.code = this.element.error.code;
+                switch (error.code) {
+                    case 1:
+                        error.strig = "Media aborted by user agent";
+                    break;
+                    case 2:
+                        error.strig = "A network error accured";
+                    break;
+                    case 4:
+                        error.strig = "Media not supported";
+                    break;
+                }
+            }
+            return error;
+        },
         currentTime: function (time, human) {
             if (typeof human === "undefined") {
                 human = false;
@@ -174,6 +195,6 @@
     window.$ = VideoApresentation;
 })();
 
-$('#video').stop(function () {
-    console.log("show");
+$('#video').on('error', function () {
+    console.log(this.getError().code);
 });
