@@ -142,12 +142,27 @@
             canvas.style.left = this.offset().left;
             var ctx = canvas.getContext('2d');
             
-            ctx.fillStyle = "rgb(255,0,0)";
+            ctx.fillStyle = this.util.color(255, 0, 0);
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             document.getElementsByTagName("body")[0].appendChild(canvas);
         },
         util: {
+            color: function color (r, g, b) {
+                if (!(this instanceof color)) {
+                    var obj = new color(r, g, b);
+                    return obj.toString();
+                } else {
+                    this.r = r;
+                    this.g = g;
+                    this.b = b;
+                }
+                
+                this.toString = function () {
+                    var color = "rgb(" + this.r + ", " + this.g + ", " + this.b + ")";
+                    return color;
+                };
+            },
             extractNumber: function (value) {
                 var test_number = Number(value.substr(0,1));
                 if (!isNaN(test_number)) {
