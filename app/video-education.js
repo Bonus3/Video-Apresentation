@@ -71,7 +71,7 @@
                 return this;
             });
         },
-        EventOrAction: function (event, callback) {
+        eventOrAction: function (event, callback) {
             this.each(function () {
                 if (typeof callback === "function") {
                     this.on(event, callback);
@@ -82,11 +82,11 @@
             return this;
         },
         play: function (callback) {
-            this.EventOrAction('play', callback);
+            this.eventOrAction('play', callback);
             return this;
         },
         pause: function (callback) {
-            this.EventOrAction('pause', callback);
+            this.eventOrAction('pause', callback);
             return this;
         },
         stop: function (callback) {
@@ -117,12 +117,47 @@
                 } else if (typeof value !== "undefined") {
                     this.element.style[property] = value;
                 } else {
-                    return this.element.style[property];
+                    var value = getComputedStyle(this.element).getPropertyValue(property);
+                    return this.util.extractNumber(value);
                 }
                 return this;
             });
         },
+        offset: function () {
+            return this.each(function () {
+                return {
+                    top: this.element.offsetTop,
+                    left: this.element.offsetLeft,
+                    bottom: this.element.offsetTop + Number(this.css("height")) + 31,
+                    right: this.element.offsetLeft + Number(this.css("width"))
+                };
+            });
+        },
+        createCanvas: function () {
+            var canvas = document.createElement('canvas');
+            canvas.width = this.css("width");
+            canvas.height = 50;
+            canvas.style.position = "absolute";
+            canvas.style.top = this.offset().bottom;
+            canvas.style.left = this.offset().left;
+            var ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = "rgb(255,0,0)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            document.getElementsByTagName("body")[0].appendChild(canvas);
+        },
         util: {
+            extractNumber: function (value) {
+                var test_number = Number(value.substr(0,1));
+                if (!isNaN(test_number)) {
+                    var pos = value.search(/[a-z]/);
+                    if (pos !== -1) {
+                        return value.substr(0, pos);
+                    }
+                }
+                return value;
+            },
             timeHumanToSeconds: function (time) {
                 var time = String(time).split(":").reverse();
                 var count = time.length;
@@ -194,7 +229,3 @@
     window.VideoApresentation = VideoApresentation;
     window.$ = VideoApresentation;
 })();
-
-$('#video').on('error', function () {
-    console.log(this.getError().code);
-});
