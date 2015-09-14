@@ -133,19 +133,52 @@
                 };
             });
         },
-        createCanvas: function () {
-            var canvas = document.createElement('canvas');
-            canvas.width = this.css("width");
-            canvas.height = 50;
-            canvas.style.position = "absolute";
-            canvas.style.top = this.offset().bottom;
-            canvas.style.left = this.offset().left;
-            var ctx = canvas.getContext('2d');
+        showControls: function () {
+            this.each(function () {
+                this.element.controls = false;
+                new this.canvas(this);
+            });
+            return this;
+        },
+        canvas: function canvas(context) {
+            if (!(this instanceof canvas)) {
+                return new canvas(this);
+            } else {
+                var context = this.context = context;
+                var canvas = this.canvas = document.createElement('canvas');
+            }
+            this.canvas.style.width = this.context.css("width");
+            this.canvas.style.height = 50;
+            this.canvas.style.position = "abslute";
+            this.canvas.style.top = this.context.offset().bottom;
+            this.canvas.style.left = this.context.offset().left;
+            document.getElementByTagName("body")[0].appendChild(this.canvas);
+            this.panel = this.canvas.getContext('2d');
             
-            ctx.fillStyle = this.util.color(255, 0, 0);
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            this.objects = [];
             
-            document.getElementsByTagName("body")[0].appendChild(canvas);
+            function Objs () {
+                if (typeof this !== "object") {
+                    return new this();
+                }
+                this.x = 0;
+                this.y = 0;
+                this.width = 0;
+                this.height = 0;
+                
+                this.color = function (r, g, b) {
+                    return new context.util.color(r, g, b);
+                };
+                
+                this.render = function (fill) {
+                    canvas[fill](this.x, this.y, this.width, this.height);
+                };
+            }
+            
+            this.rect = function Rect() {
+                Objs.call(this);
+                this.render("fillRect");
+            };
         },
         util: {
             color: function color (r, g, b) {
